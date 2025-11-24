@@ -3,107 +3,123 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define PIPE_INTERVAL_FRAMES 20  /* quantos frames entre canos */
-#define GRAVITY 1                /* incremento de velocidade por frame */
-#define FLAP_VELOCITY -3         /* impulso do flap */
+// atualiza estado do jogo: passaro, canos, pontuacao e colisao
+void atualizar_jogo(EstadoJogo *g) {
 
-/* cria novo cano ao final da fila */
-void add_pipe(GameState *g) {
-    if (!g) return;
-    if (g->pipe_count >= PIPE_MAX) return;
+    if (!g || g->jogo_acabou) return;
 
-    Pipe *p = &g->pipes[g->pipe_count++];
-    p->x = SCREEN_WIDTH - 1;
-    p->gap_size = 5;
-    p->gap_y = 1 + (rand() % (SCREEN_HEIGHT - p->gap_size - 2));
-}
+    g->quadro++;
 
-/* jogador faz flap: aplicar impulso negativo */
-void game_flap(GameState *g) {
-    if (!g) return;
-    g->bird.velocity = FLAP_VELOCITY;
-}
+    // gravidade simples
+    g->passaro.velocidade += 1;
+    g->passaro.y += g->passaro.velocidade;
 
-/* atualiza fisica, move canos, gera canos e checa colisao */
-void game_update(GameState *g) {
-    if (!g || g->game_over) return;
-
-    g->frame++;
-
-    /* gravidade */
-    g->bird.velocity += GRAVITY;
-    g->bird.y += g->bird.velocity;
-
-    /* limites vertical */
-    if (g->bird.y < 0) g->bird.y = 0;
-    if (g->bird.y >= SCREEN_HEIGHT) {
-        g->bird.y = SCREEN_HEIGHT - 1;
-        g->game_over = 1;
+    // se bate no chão
+    if (g->passaro.y >= ALTURA_TELA) {
+        g->passaro.y = ALTURA_TELA - 1;
+        g->jogo_acabou = 1;
     }
 
-    /* mover canos para esquerda e remover os que sairam */
-    for (int i = 0; i < g->pipe_count; ++i) {
-        g->pipes[i].x--;
+    // se bate no teto
+    if (g->passaro.y < 0) {
+        g->passaro.y = 0;
+        g->jogo_acabou = 1;
     }
 
-    /* remover canos com x < 0 e incrementar score */
-    for (int i = 0; i < g->pipe_count; ++i) {
-        if (g->pipes[i].x < 0) {
-            /* shift left */
-            for (int j = i; j < g->pipe_count - 1; ++j) g->pipes[j] = g->pipes[j+1];
-            g->pipe_count--;
-            g->score++;
-            i--;
+    // move os canos para a esquerda
+    for (int i = 0; i < g->total_canos; i++) {
+        g->canos[i].x--;
+    }
+
+    // remove canos que sairam da tela
+    int novo_total = 0;
+    for (int i = 0; i < g->total_canos; i++) {
+        if (g->canos[i].x >= 0) {
+            g->canos[novo_total++] = g->canos[i];
         }
     }
+    g->total_canos = novo_total;
 
-    /* gerar novo cano em intervalos */
-    if (g->frame % PIPE_INTERVAL_FRAMES == 0) {
-        add_pipe(g);
+    // cria novo cano a cada 15 frames
+    if (g->quadro % 15 == 0) {
+        adicionar_cano(g);
     }
 
-    /* colisao: se existir cano na coluna do passaro, verificar gap */
-    for (int i = 0; i < g->pipe_count; ++i) {
-        Pipe *p = &g->pipes[i];
-        if (p->x == BIRD_X) {
-            if (!(g->bird.y >= p->gap_y && g->bird.y <= p->gap_y + p->gap_size)) {
-                g->game_over = 1;
+    // verifica colisão com canos
+    for (int i = 0; i < g->total_canos; i++) {
+        Cano *c = &g->canos[i];
+
+        if (c->x == PASSARO_X) {
+
+            // se não passou pelo espaço
+            if (!(g->passaro.y >= c->gap_y &&
+                  g->passaro.y <  c->gap_y + c->gap_tam)) {
+
+                g->jogo_acabou = 1;
+
+            } else {
+                g->pontuacao++;
             }
         }
     }
 }
 
-/* desenha tela (usa util_clear_screen) */
-void draw_game(const GameState *g) {
+// faz o passaro subir
+void pular(EstadoJogo *g) {
+    if (!g || g->jogo_acabou) return;
+    g->passaro.velocidade = -3;
+}
+
+// adiciona novo cano na extrema direita
+void adicionar_cano(EstadoJogo *g) {
+
+    if (g->total_canos >= MAX_CANO) return;
+
+    Cano *c = &g->canos[g->total_canos++];
+    c->x = LARGURA_TELA - 1;
+    c->gap_tam = 5;
+    c->gap_y = rand() % (ALTURA_TELA - c->gap_tam);
+}
+
+// desenha estado do jogo no terminal
+void desenhar_jogo(const EstadoJogo *g) {
+
     if (!g) return;
+
     util_clear_screen();
 
-    for (int y = 0; y < SCREEN_HEIGHT; ++y) {
-        for (int x = 0; x < SCREEN_WIDTH; ++x) {
-            /* desenha passaro */
-            if (x == BIRD_X && y == g->bird.y) {
+    for (int y = 0; y < ALTURA_TELA; y++) {
+        for (int x = 0; x < LARGURA_TELA; x++) {
+
+            // desenha passaro
+            if (x == PASSARO_X && y == g->passaro.y) {
                 putchar('>');
                 continue;
-            }
+         }
 
-            int drew = 0;
-            /* desenha canos */
-            for (int i = 0; i < g->pipe_count; ++i) {
-                const Pipe *p = &g->pipes[i];
-                if (p->x == x) {
-                    if (y < p->gap_y || y > p->gap_y + p->gap_size) {
+            int desenhou = 0;
+
+            // desenha canos
+            for (int i = 0; i < g->total_canos; i++) {
+                Cano c = g->canos[i];
+
+                if (x == c.x) {
+                    if (!(y >= c.gap_y && y < c.gap_y + c.gap_tam)) {
                         putchar('|');
-                        drew = 1;
-                    }
-                    break;
+                        desenhou = 1;
+                        break;
                 }
             }
+            }
 
-            if (!drew) putchar(' ');
+            if (!desenhou)
+                putchar(' ');
         }
         putchar('\n');
     }
 
-    printf("\nSCORE: %d\n", g->score);
-    if (g->game_over) printf("GAME OVER\n");
+    printf("\nPontos: %d\n", g->pontuacao);
+
+    if (g->jogo_acabou)
+        printf("FIM DE JOGO!\n");
 }

@@ -2,18 +2,23 @@
 #include <stdlib.h>
 #include <string.h>
 
-void init_game(GameState *g) {
+// inicializaa
+void jogo_iniciar(EstadoJogo *g) {
     if (!g) return;
-    g->score = 0;
-    g->frame = 0;
-    g->game_over = 0;
-    g->pipe_count = 0;
-    g->bird.y = SCREEN_HEIGHT / 2;
-    g->bird.velocity = 0;
+
+    g->pontuacao = 0;
+    g->quadro = 0;
+    g->jogo_acabou = 0;
+    g->total_canos = 0;
+
+    g->passaro.y = ALTURA_TELA / 2;
+    g->passaro.velocidade = 0;
 }
 
-void reset_bird(GameState *g) {
+// reseta
+void passaro_resetar(EstadoJogo *g) {
     if (!g) return;
-    g->bird.y = SCREEN_HEIGHT / 2;
-    g->bird.velocity = 0;
+
+    g->passaro.y = ALTURA_TELA / 2;
+    g->passaro.velocidade = 0;
 }

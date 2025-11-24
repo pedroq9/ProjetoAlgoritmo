@@ -1,135 +1,195 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
 #include "model.h"
 #include "game.h"
 #include "io.h"
 #include "util.h"
 
-int main_menu(void) {
-    int op;
+// Menu principal
+int menu_principal(void) {
+
     util_clear_screen();
-    printf("=== FLIP BIRD (texto) ===\n");
-    printf("1 - Jogar (novo)\n");
+
+    printf("FLAPPY \n");
+    printf("1 - Novo jogo\n");
     printf("2 - Continuar (carregar)\n");
-    printf("3 - Salvar estado\n");
+    printf("3 - Salvar jogo\n");
     printf("4 - Ranking\n");
     printf("5 - Sair\n");
     printf("Escolha: ");
+
+    int op;
     if (scanf("%d", &op) != 1) {
         int c; while ((c = getchar()) != '\n' && c != EOF);
         return 0;
     }
-    int c; while ((c = getchar()) != '\n' && c != EOF);
+
+    int c;
+    while ((c = getchar()) != '\n' && c != EOF);
+
     return op;
 }
 
 int main(void) {
+
     util_init();
-    GameState g;
-    char player_name[64] = "Player";
 
-    init_game(&g);
+    if (!util_garantir_pasta_data()) {
+        fprintf(stderr, "Aviso: nao foi possível criar/abrir a pasta 'data'. Salvamento pode falhar.\n");
+    }
 
-    int running = 1;
-    while (running) {
-        int op = main_menu();
-        if (op == 1) {
-            init_game(&g);
+    EstadoJogo jogo;
+    char nome_jogador[64] = "Jogador";
+
+    jogo_iniciar(&jogo);
+
+    int executando = 1;
+
+    while (executando) {
+
+        int opcao = menu_principal();
+
+        // novo jogo
+        if (opcao == 1) {
+
+            jogo_iniciar(&jogo);
             util_clear_screen();
-            printf("Digite seu nome (ENTER): ");
-            util_kbhit(); /* limpar possivel estado */
-            if (fgets(player_name, sizeof(player_name), stdin)) {
-                size_t ln = strlen(player_name);
-                if (ln && player_name[ln-1] == '\n') player_name[ln-1] = '\0';
+
+            printf("Digite seu nome: ");
+            if (fgets(nome_jogador, sizeof(nome_jogador), stdin)) {
+                size_t ln = strlen(nome_jogador);
+                if (ln && nome_jogador[ln - 1] == '\n')
+                    nome_jogador[ln - 1] = '\0';
             }
-            /* brief instruction */
+
             util_clear_screen();
-            printf("Jogo iniciando. Aperte ESPACO + ENTER para subir (modo printf).\n");
-            printf("Se quiser sair durante o jogo digite 'q' e ENTER.\n");
-            printf("Aperte ENTER para comecar...");
+            printf("Iniciando...\n");
+            printf("Use ESPACO ou W para pular.\n");
+            printf("Pressione ENTER para comecar...");
             getchar();
 
-            /* game loop */
-            g.game_over = 0;
-            while (!g.game_over) {
-                draw_game(&g);
+            jogo.jogo_acabou = 0;
 
-                /* ler input nao-bloqueante: aqui usamos check kbhit e getch */
+            // loop principal
+            while (!jogo.jogo_acabou) {
+
+                desenhar_jogo(&jogo);
+
+                // entrada
                 if (util_kbhit()) {
-                    int ch = util_getch();
-                    if (ch == ' ' || ch == 'w' || ch == 'W') {
-                        game_flap(&g);
-                    } else if (ch == 'q' || ch == 'Q') {
-                        g.game_over = 1;
+
+                    int tecla = util_getch();
+
+                    if (tecla == ' ' || tecla == 'w' || tecla == 'W')
+                        pular(&jogo);
+
+                    else if (tecla == 'q' || tecla == 'Q') {
+                        jogo.jogo_acabou = 1;
                         break;
                     }
                 }
 
-                game_update(&g);
-                util_sleep_ms(80); /* controla velocidade do jogo */
+                atualizar_jogo(&jogo);
+                util_sleep_ms(80);
             }
 
-            draw_game(&g);
-            printf("\nFim de jogo. Score: %d\n", g.score);
-            /* salvar best e ranking simples */
-            int best = 0;
-            io_load_best_score(&best);
-            if (g.score > best) {
-                io_save_best_score(g.score);
-                printf("Novo record: %d\n", g.score);
+            desenhar_jogo(&jogo);
+            printf("\nFim do jogo — Pontos: %d\n", jogo.pontuacao);
+
+            // recorde
+            int recorde = 0;
+            carregar_melhor_pontuacao(&recorde);
+
+            if (jogo.pontuacao > recorde) {
+                salvar_melhor_pontuacao(jogo.pontuacao);
+                printf("Novo recorde!\n");
             } else {
-                printf("Record atual: %d\n", best);
+                printf("Recorde atual: %d\n", recorde);
             }
-            printf("Digite seu nome para ranking (ENTER salva, vazio nao salva): ");
-            char nick[64] = {0};
+
+            // ranking
+            printf("\nDigite seu nome para ranking (vazio = nao salvar): ");
+            char nick[64] = "";
+
             if (fgets(nick, sizeof(nick), stdin)) {
                 size_t ln = strlen(nick);
-                if (ln && nick[ln-1] == '\n') nick[ln-1] = '\0';
-                if (nick[0] != '\0') io_add_ranking(nick, g.score);
+                if (ln && nick[ln - 1] == '\n')
+                    nick[ln - 1] = '\0';
+
+                if (nick[0] != '\0')
+                    adicionar_ranking(nick, jogo.pontuacao);
             }
-            printf("Pressione ENTER para voltar ao menu...");
+
+            printf("Pressione ENTER para voltar...");
             getchar();
         }
-        else if (op == 2) {
-            if (io_load_state(&g)) {
-                printf("Estado carregado. Aperte ENTER para continuar...");
+
+            //carrega
+        else if (opcao == 2) {
+
+            if (carregar_jogo(&jogo)) {
+
+                printf("Jogo carregado! Pressione ENTER...");
                 getchar();
-                /* resume jogo loop */
-                while (!g.game_over) {
-                    draw_game(&g);
+
+                while (!jogo.jogo_acabou) {
+
+                    desenhar_jogo(&jogo);
+
                     if (util_kbhit()) {
-                        int ch = util_getch();
-                        if (ch == ' ' || ch == 'w' || ch == 'W') game_flap(&g);
-                        else if (ch == 'q' || ch == 'Q') { g.game_over = 1; break; }
+                        int tecla = util_getch();
+
+                        if (tecla == ' ' || tecla == 'w' || tecla == 'W')
+                            pular(&jogo);
+
+                        else if (tecla == 'q' || tecla == 'Q') {
+                            jogo.jogo_acabou = 1;
+                            break;
+                        }
                     }
-                    game_update(&g);
+
+                    atualizar_jogo(&jogo);
                     util_sleep_ms(80);
                 }
-                draw_game(&g);
-                printf("\nFim. Score: %d\n", g.score);
+
+                desenhar_jogo(&jogo);
+                printf("\nFim — Pontos: %d\n", jogo.pontuacao);
                 printf("Pressione ENTER para voltar...");
                 getchar();
+
             } else {
-                printf("Nenhum save encontrado. Pressione ENTER...");
+                printf("Nenhum save encontrado. ENTER...");
                 getchar();
             }
         }
-        else if (op == 3) {
-            if (io_save_state(&g)) printf("Estado salvo.\n");
-            else printf("Erro ao salvar.\n");
-            printf("Pressione ENTER...");
+
+        //salva
+        else if (opcao == 3) {
+
+            if (salvar_jogo(&jogo))
+                printf("Jogo salvo!\n");
+            else
+                printf("Erro ao salvar!\n");
+
+            printf("ENTER...");
             getchar();
         }
-        else if (op == 4) {
+
+        //ranking 
+        else if (opcao == 4) {
+
             util_clear_screen();
-            printf("=== RANKING ===\n");
-            io_show_ranking();
-            printf("\nPressione ENTER...");
+            printf("RANKING\n");
+            mostrar_ranking();
+            printf("\nENTER...");
             getchar();
         }
+
+        //sair
         else {
-            running = 0;
+            executando = 0;
         }
     }
 

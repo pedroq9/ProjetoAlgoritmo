@@ -3,17 +3,27 @@
 
 #include "model.h"
 
-#define SAVE_FILE "data/flappy_save.txt"
-#define BEST_FILE "data/flappy_best.txt"
-#define RANK_FILE "data/flappy_ranking.txt"
+#define ARQ_SAVE    "data/salvamento.txt"
+#define ARQ_MELHOR  "data/melhor_pontuacao.txt"
+#define ARQ_RANKING "data/ranking.txt"
 
-int io_save_state(const GameState *g);
-int io_load_state(GameState *g);
 
-int io_save_best_score(int best);
-int io_load_best_score(int *best);
+// salva o jogo
+int salvar_jogo(const EstadoJogo *g);
 
-void io_add_ranking(const char *name, int score);
-void io_show_ranking(void);
+// carrega o estado de jogo
+int carregar_jogo(EstadoJogo *g);
+
+// salva M pontuacao
+int salvar_melhor_pontuacao(int melhor);
+
+// carrega M pontuaca
+int carregar_melhor_pontuacao(int *melhor);
+
+// adciona entrad rankin
+void adicionar_ranking(const char *nome, int pontuacao);
+
+// mostra o rankinf
+void mostrar_ranking(void);
 
 #endif

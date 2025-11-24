@@ -3,16 +3,16 @@
 
 #include "model.h"
 
-/* atualiza um frame do jogo (fisica, canos, colisao, pontuacao) */
-void game_update(GameState *g);
+// atualiza fisica movimento canos  colisao
+void atualizar_jogo(EstadoJogo *g);
 
-/* acao do jogador: flap */
-void game_flap(GameState *g);
+// faz o passaro pular
+void pular(EstadoJogo *g);
 
-/* desenha tela no terminal (usa putchar/printf) */
-void draw_game(const GameState *g);
+// desenha o jogo
+void desenhar_jogo(const EstadoJogo *g);
 
-/* gera um novo cano */
-void add_pipe(GameState *g);
+// adciona um cano
+void adicionar_cano(EstadoJogo *g);
 
 #endif

@@ -1,33 +1,35 @@
-#ifndef MODEL_H
-#define MODEL_H
+#ifndef MODELO_H
+#define MODELO_H
 
-#define PIPE_MAX 16
-#define SCREEN_HEIGHT 20
-#define SCREEN_WIDTH 40
-#define BIRD_X 5
+#define MAX_CANO 16
+#define ALTURA_TELA 20
+#define LARGURA_TELA 40
+#define PASSARO_X 5
+
+// representa o passáro 
+typedef struct {
+    int y;           
+    int velocidade;  
+} Passaro;
+
+// representa o cano
+typedef struct {
+    int x;         
+    int gap_y;     
+    int gap_tam;   
+} Cano;
 
 typedef struct {
-    int y;          /* altura do passaro (0..SCREEN_HEIGHT-1) */
-    int velocity;   /* velocidade vertical (inteiro simples) */
-} Bird;
+    Passaro passaro;
+    Cano canos[MAX_CANO];
+    int total_canos;
+    int pontuacao;
+    int quadro;
+    int jogo_acabou;
+} EstadoJogo;
 
-typedef struct {
-    int x;          /* posicao horizontal */
-    int gap_y;      /* posicao vertical do gap (top) */
-    int gap_size;   /* tamanho do gap (altura) */
-} Pipe;
-
-typedef struct {
-    Bird bird;
-    Pipe pipes[PIPE_MAX];
-    int pipe_count;
-    int score;
-    int frame;
-    int game_over;
-} GameState;
-
-/* inicializa ou reseta o estado do jogo */
-void init_game(GameState *g);
-void reset_bird(GameState *g);
+   // inicializa e/ ou encerra o estado de jogo
+void jogo_iniciar(EstadoJogo *g);
+void passaro_resetar(EstadoJogo *g);
 
 #endif
