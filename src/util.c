@@ -16,7 +16,7 @@
 
 
 
-// LINUX ou Mac OS
+// no LINUS ou Mac OS
 #include <unistd.h>
 #include <termios.h>
 #include <fcntl.h>
@@ -25,8 +25,8 @@
 #define MKDIR(path) mkdir(path, 0755)
 #endif
 
-// inicialização / utilidades
-
+/* ========================= */
+/* Inicialização e utilidades */
 void util_init(void) {
     srand((unsigned)time(NULL));
 }
@@ -107,12 +107,12 @@ int util_garantir_pasta_data(void)
 {
     struct stat st;
 
-    //se já existe diretório 
+    //se já existe e é diretório 
     if (stat("data", &st) == 0) {
         #ifndef _WIN32
         if (S_ISDIR(st.st_mode)) return 1;
         #else
-
+        
         if ((st.st_mode & _S_IFDIR) != 0) return 1;
         #endif
         return 0;  

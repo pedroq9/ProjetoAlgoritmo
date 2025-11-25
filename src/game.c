@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-// atualizaaa estado do jogo: passaro,canos,pontuacao e colisao
+// atualiza estado do jogo: passaro, canos, pontuacao e colisao
 void atualizar_jogo(EstadoJogo *g) {
 
     if (!g || g->jogo_acabou) return;
@@ -91,7 +91,7 @@ void desenhar_jogo(const EstadoJogo *g) {
     for (int y = 0; y < ALTURA_TELA; y++) {
         for (int x = 0; x < LARGURA_TELA; x++) {
 
-            // desenhaa passaroo
+            // desenha passaro
             if (x == PASSARO_X && y == g->passaro.y) {
                 putchar('>');
                 continue;
@@ -99,7 +99,7 @@ void desenhar_jogo(const EstadoJogo *g) {
 
             int desenhou = 0;
 
-            // desenha canoos
+            // desenha canos
             for (int i = 0; i < g->total_canos; i++) {
                 Cano c = g->canos[i];
 

@@ -37,7 +37,7 @@ int main(void) {
     util_init();
 
     if (!util_garantir_pasta_data()) {
-        fprintf(stderr, "Aviso: nao foi possivel criar/abrir a pasta 'data'. Salvamento pode falhar.\n");
+        fprintf(stderr, "Aviso: nao foi possível criar/abrir a pasta 'data'. Salvamento pode falhar.\n");
     }
 
     EstadoJogo jogo;
@@ -96,7 +96,7 @@ int main(void) {
             }
 
             desenhar_jogo(&jogo);
-            printf("\nFim do jogo - Pontos: %d\n", jogo.pontuacao);
+            printf("\nFim do jogo — Pontos: %d\n", jogo.pontuacao);
 
             // recorde
             int recorde = 0;
@@ -110,7 +110,7 @@ int main(void) {
             }
 
             // ranking
-            printf("\nDigite seu nome para ranking (vazio = nao salva): ");
+            printf("\nDigite seu nome para ranking (vazio = nao salvar): ");
             char nick[64] = "";
 
             if (fgets(nick, sizeof(nick), stdin)) {
@@ -155,7 +155,7 @@ int main(void) {
                 }
 
                 desenhar_jogo(&jogo);
-                printf("\nFim - Pontos: %d\n", jogo.pontuacao);
+                printf("\nFim — Pontos: %d\n", jogo.pontuacao);
                 printf("Pressione ENTER para voltar...");
                 getchar();
 

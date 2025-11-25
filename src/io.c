@@ -123,7 +123,7 @@ void mostrar_ranking(void)
 
     while (fscanf(f, "%s %d", nome, &score) == 2)
     {
-        printf("%d  %-10s  %d pontos\n", pos++, nome, score);
+        printf("%d°  %-10s  %d pontos\n", pos++, nome, score);
     }
 
     fclose(f);

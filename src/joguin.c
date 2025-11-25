@@ -19,7 +19,7 @@
 #define MKDIR(path) mkdir(path, 0755)
 #endif
 
-//  MODEL.H 
+// ====================== MODELO.H ======================
 
 #define MAX_CANO 16
 #define ALTURA_TELA 20
@@ -46,7 +46,7 @@ typedef struct {
     int jogo_acabou;
 } EstadoJogo;
 
-// GAME.C 
+// ====================== GAME.C ======================
 
 void jogo_iniciar(EstadoJogo *g) {
     if (!g) return;
@@ -64,7 +64,7 @@ void passaro_resetar(EstadoJogo *g) {
     g->passaro.velocidade = 0;
 }
 
-// UTIL.C 
+// ====================== UTIL.C ======================
 
 void util_init(void) {
     srand((unsigned)time(NULL));
@@ -145,7 +145,7 @@ int util_garantir_pasta_data(void) {
     return 0;
 }
 
-//  IO.C 
+// ====================== IO.C ======================
 
 #define ARQ_SAVE    "data/salvamento.txt"
 #define ARQ_MELHOR  "data/melhor_pontuacao.txt"
@@ -177,7 +177,7 @@ int carregar_jogo(EstadoJogo *g) {
 
 int salvar_melhor_pontuacao(int melhor) {
     FILE *f = fopen(ARQ_MELHOR, "w");
-    if (!f) { perror("Erro ao abrir arquivo de melhor pontuacao"); return 0; }
+    if (!f) { perror("Erro ao abrir arquivo de melhor pontuação"); return 0; }
     fprintf(f, "%d", melhor);
     fclose(f);
     return 1;
@@ -185,7 +185,7 @@ int salvar_melhor_pontuacao(int melhor) {
 
 int carregar_melhor_pontuacao(int *melhor) {
     FILE *f = fopen(ARQ_MELHOR, "r");
-    if (!f) { perror("Erro ao abrir arquivo de melhor pontuacao"); return 0; }
+    if (!f) { perror("Erro ao abrir arquivo de melhor pontuação"); return 0; }
     fscanf(f, "%d", melhor);
     fclose(f);
     return 1;
@@ -203,11 +203,11 @@ void mostrar_ranking(void) {
     if (!f) { printf("Nenhum ranking salvo ainda.\n"); return; }
     char nome[64]; int score; int pos = 1;
     while (fscanf(f, "%s %d", nome, &score) == 2)
-        printf("%d  %-10s  %d pontos\n", pos++, nome, score);
+        printf("%d°  %-10s  %d pontos\n", pos++, nome, score);
     fclose(f);
 }
 
-// logica
+// ====================== GAME LOGIC ======================
 
 void atualizar_jogo(EstadoJogo *g) {
     if (!g || g->jogo_acabou) return;
@@ -258,7 +258,7 @@ void desenhar_jogo(const EstadoJogo *g) {
     if (g->jogo_acabou) printf("FIM DE JOGO!\n");
 }
 
-// MAIN.C
+// ====================== MAIN.C ======================
 
 int menu_principal(void) {
     util_clear_screen();
@@ -277,7 +277,7 @@ int menu_principal(void) {
 
 int main(void) {
     util_init();
-    if (!util_garantir_pasta_data()) fprintf(stderr, "Aviso: nao foi possivel criar/abrir a pasta 'data'. Salvamento pode falhar.\n");
+    if (!util_garantir_pasta_data()) fprintf(stderr, "Aviso: nao foi possível criar/abrir a pasta 'data'. Salvamento pode falhar.\n");
 
     EstadoJogo jogo;
     char nome_jogador[64] = "Jogador";
@@ -310,7 +310,7 @@ int main(void) {
                 util_sleep_ms(80);
             }
             desenhar_jogo(&jogo);
-            printf("\nFim do jogo - Pontos: %d\n", jogo.pontuacao);
+            printf("\nFim do jogo — Pontos: %d\n", jogo.pontuacao);
 
             int recorde = 0;
             carregar_melhor_pontuacao(&recorde);
@@ -342,7 +342,7 @@ int main(void) {
                     util_sleep_ms(80);
                 }
                 desenhar_jogo(&jogo);
-                printf("\nFim - Pontos: %d\n", jogo.pontuacao);
+                printf("\nFim — Pontos: %d\n", jogo.pontuacao);
                 printf("Pressione ENTER para voltar...");
                 getchar();
             } else { printf("Nenhum save encontrado. ENTER..."); getchar(); }
@@ -360,4 +360,5 @@ int main(void) {
         else executando = 0;
     }
 
+    return 0;
 }

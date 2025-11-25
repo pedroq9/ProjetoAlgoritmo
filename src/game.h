@@ -3,16 +3,16 @@
 
 #include "model.h"
 
-// atualizaaa fisica movimento canos  colisao
+// atualiza fisica movimento canos  colisao
 void atualizar_jogo(EstadoJogo *g);
 
 // faz o passaro pular
 void pular(EstadoJogo *g);
 
-// desenhaa o jogo
+// desenha o jogo
 void desenhar_jogo(const EstadoJogo *g);
 
-// adcionaa um cano
+// adciona um cano
 void adicionar_cano(EstadoJogo *g);
 
 #endif
