@@ -1,0 +1,128 @@
+			Referências do Flapp Bird em C
+
+Pra comemçar, o próprio Flappy Bird foi nossa maior referência, pois foi a referência conceitual e mecânica principal. 
+Todos os elementos centrais do seu projeto foram inspirados nele:
+
+- Física simples do pássaro; 
+- O deslocamento lateral dos canos;
+- A presença de um espaço entre os canos;
+- O controle minimalista (um único botão);
+- O sistema de pontuação progressiva;
+- O estilo rápido de tentativa > erro > tentar novamente;
+- Entender como o “loop principal” deve se comportar;
+- Definir a estrutura básica do jogo;
+- Aplicar noções de física simplificada;
+- Criar um sistema coerente de colisão e pontuação;
+- Construir uma sensação semelhante ao Flappy Bird original, mas em C.
+
+------------------------------------------------------------------------------------------------- 
+
+1 - Criação dos diretórios em C - (mkdir/ _mkdir)
+Link: https://en.cppreference.com/w/c/io 
+
+Como ajudou:
+- Base para implementar util_garantir_pasta_data().
+- Mostrou diferença entre diretorios em Windows (_mkdir) e Linux (mkdir)
+- Possibilitou criar /data/ automaticamente para salvar ranking e logs.
+
+-------------------------------------------------------------------------------------------------
+
+2 - stat() - verifica se um diretório existe
+Link: https://pubs.opengroup.org/onlinepubs/9699919799/functions/stat.html
+
+Como ajudou:
+
+- Permitido testar se a pasta data/ já existe
+- Ajudou a lidar com diferença entre S_ISDIR (Linux) e _S_IFDIR (Windows)
+
+-------------------------------------------------------------------------------------------------
+
+3 - system("cls") / system("clear") - limpar tela
+Link: https://stackoverflow.com/questions/2347770/how-do-you-clear-the-console-screen-in-c
+
+Como ajudou: 
+
+- Implementar util_clear_screen() de forma simples e funcional
+
+-------------------------------------------------------------------------------------------------
+
+4 - strftime() - formatar datas e timestamps
+Link: https://en.cppreference.com/w/c/chrono/strftime
+
+Como ajudou: 
+
+- Base conceitual para criar timestamps
+- Permitindo montar logs e ranking com data e hora
+
+-------------------------------------------------------------------------------------------------
+
+5 - Estrutura de projeto em múltiplos arquivos .c e .h
+Link: https://gcc.gnu.org/onlinedocs/gcc/
+
+Como ajudou:
+
+- Dividir o jogo e main.c, game.c, model.c, util.c, io.c.
+- Evitar código gigantesco e caótico.
+- Permitir manutenção fácil (ranking, jogo, lógica separada)
+
+-------------------------------------------------------------------------------------------------
+
+6 - fopen(), fwrite(), fscanf() - manipulação de arquivos
+Link: https://en.cppreference.com/w/c/io
+
+Como ajudou: 
+
+- Criar sistema de save, ranking e logs
+- Validar erros ao abrir arquivos.
+- Escrever pontuações.
+
+-------------------------------------------------------------------------------------------------
+
+7 - VadimBoev / FlappyBird (C - Terminal)
+Link: https://hellogithub.com/en/repository/VadimBoev/FlappyBird?utm_source=chatgpt.com
+
+Como ajudou: 
+
+- Referência útil para entender movimentação dos canos, lógica de colisão simples e atualização de posição do pássaro sem bibliotecas gráficas. 
+- Serviu como comparação para validar partes da física básica e loop do jogo.
+
+-------------------------------------------------------------------------------------------------
+
+8 - smvd / FlappyBird.c 
+Link: https://gist.github.com/smvd/aeaa7544f75988081285ab399c2579c7?utm_source=chatgpt.com
+
+Como ajudou: 
+
+- Auxiliou a visualizar a versão “crua” do jogo, permitindo comparar a estrutura modular (model, game, io, util) com uma abordagem mais simples.
+- Inspirou melhorias na lógica de input e atualização de frames.
+
+-------------------------------------------------------------------------------------------------
+
+9 Sites de aprendizado 
+
+GeeksForGeeks - https://www.geeksforgeeks.org
+Tutorialspoint - https://www.tutorialspoint.com/cprogramming/index.html
+Programiz - https://www.programiz.com/c-programming
+
+Como ajudaram no projeto:
+
+- Auxiliaram no reforço de conceitos como:
+- Uso correto de structs
+- Manipulação de arquivos
+- Funções utilitárias (rand(), srand())
+- Boas práticas de modularização
+
+------------------------------------------------------------------------------------------------- 
+
+10 - ChatGPT 
+Link: https://chatgpt.com
+
+Como ajudou: 
+
+- Modularizar o código em vários arquivos.
+- Corrigir problemas como salvamento, load e ranking.
+- Explicar erros de compilação.
+- Gerar exemplos de implementações possíveis.
+- Auxílio na produção e revisão do código.
+- Verificou funções utilitárias.
+
